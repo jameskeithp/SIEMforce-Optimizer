@@ -1,0 +1,21 @@
+- name: Update DLP software rules
+  hosts: dlp_servers
+  become: yes
+  tasks:
+    - name: Add new DLP policy rules
+      copy:
+        dest: "/etc/dlp/policies/"
+        content: |
+          policy {
+            name: "Block External Exfiltration"
+            action: block
+            condition: destination_ip != internal_network
+          }
+      notify: restart dlp_service
+
+  handlers:
+    - name: restart dlp_service
+      service:
+        name: dlp_service
+        state: restarted
+
