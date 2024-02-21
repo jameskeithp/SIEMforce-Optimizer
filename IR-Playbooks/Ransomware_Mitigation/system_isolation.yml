@@ -1,0 +1,21 @@
+- name: Isolate infected systems
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Disable network interfaces
+      community.general.nmcli:
+        conn_name: "{{ item }}"
+        state: down
+      loop: "{{ network_interfaces }}"
+      ignore_errors: yes
+
+    - name: Inform security team
+      mail:
+        host: smtp.example.com
+        port: 587
+        username: 'alert@example.com'
+        password: 'yourpassword'
+        to: Security Team <security@example.com>
+        subject: 'Automated Isolation of Infected System - {{ inventory_hostname }}'
+        body: 'The system {{ inventory_hostname }} has been isolated due to a ransomware detection.'
+
