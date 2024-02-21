@@ -1,0 +1,17 @@
+- name: Update email filtering rules
+  hosts: email_servers
+  become: yes
+  tasks:
+    - name: Add rule to block phishing domains
+      lineinfile:
+        path: /etc/mail/spamassassin/local.cf
+        line: "blacklist_from *.phishingsite.com"
+        create: yes
+      notify: restart spamassassin
+
+  handlers:
+    - name: restart spamassassin
+      service:
+        name: spamassassin
+        state: restarted
+
